@@ -1,0 +1,33 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Lista temporal para almacenar tareas
+tasks = []
+
+# Ruta para obtener todas las tareas
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    return jsonify(tasks)
+
+# Ruta para agregar una tarea
+@app.route('/tasks', methods=['POST'])
+def add_task():
+    data = request.json
+    task = {
+        "id": len(tasks) + 1,
+        "title": data.get("title"),
+        "completed": False
+    }
+    tasks.append(task)
+    return jsonify(task), 201
+
+# Ruta para eliminar una tarea
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    global tasks
+    tasks = [task for task in tasks if task["id"] != task_id]
+    return jsonify({"message": "Tarea eliminada"}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
